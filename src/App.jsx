@@ -49,13 +49,17 @@ function Marketplace() {
   });
 
   return (
-    <div className="min-h-screen bg-gray-100 flex flex-col">
-      <Header />
-      <div className="flex flex-1">
-        <Sidebar onFilterChange={handleFilterChange} activeCategory={filters.category} />
-        <main className="flex-1 p-8">
-          <h1 className="text-3xl font-bold mb-2 text-gray-900">Vehicle Listings</h1>
-          <p className="text-gray-600 mb-6">{filteredItems.length} vehicles found</p>
+    <div className="min-h-screen bg-gray-100 flex">
+      {/* Sidebar - Full height on left */}
+      <Sidebar onFilterChange={handleFilterChange} activeCategory={filters.category} />
+
+      {/* Main content area - Right side */}
+      <div className="flex-1 flex flex-col">
+        <Header />
+        <main className="flex-1 p-8 overflow-x-hidden">
+          <div className="mb-8">
+            <h1 className="text-3xl font-bold mb-2 text-gray-900">Today's Picks for You</h1>
+          </div>
 
           {loading ? (
             <div className="text-center py-12">
@@ -63,7 +67,7 @@ function Marketplace() {
             </div>
           ) : (
             <>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-6 w-full">
                 {filteredItems.map((item) => (
                   <ListingCard key={item.id} item={item} />
                 ))}
@@ -76,8 +80,8 @@ function Marketplace() {
             </>
           )}
         </main>
+        <Footer />
       </div>
-      <Footer />
     </div>
   );
 }

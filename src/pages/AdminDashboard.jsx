@@ -2,50 +2,109 @@ import { useState, useEffect } from 'react';
 import { X } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabaseClient';
+import { Tag } from 'lucide-react';
+
 function InventoryTable({ inventory, onDelete, onEdit }) {
+  const [openMenuId, setOpenMenuId] = useState(null);
+
   if (!inventory || inventory.length === 0) {
     return <p className="text-gray-500 mt-4">No inventory available. Add your first item!</p>;
   }
 
+  const toggleMenu = (id) => {
+    setOpenMenuId(openMenuId === id ? null : id);
+  };
+
   return (
-    <div className="overflow-x-auto bg-white rounded shadow">
-      <table className="min-w-full divide-y divide-gray-200">
+    <div className="overflow-visible bg-white rounded shadow w-full">
+      <div className="overflow-x-auto">
+        <table className="w-full divide-y divide-gray-200">
         <thead className="bg-gray-100">
           <tr>
+            <th className="px-4 py-2 text-left text-sm font-semibold text-gray-700">Image</th>
             <th className="px-4 py-2 text-left text-sm font-semibold text-gray-700">Title</th>
             <th className="px-4 py-2 text-left text-sm font-semibold text-gray-700">Category</th>
-            <th className="px-4 py-2 text-left text-sm font-semibold text-gray-700">Condition</th>
             <th className="px-4 py-2 text-left text-sm font-semibold text-gray-700">Price</th>
-            <th className="px-4 py-2 text-left text-sm font-semibold text-gray-700">Location</th>
             <th className="px-4 py-2 text-left text-sm font-semibold text-gray-700">Actions</th>
           </tr>
         </thead>
-        <tbody className="divide-y divide-gray-200">
-          {inventory.map((item) => (
-            <tr key={item.id} className="hover:bg-gray-50">
-              <td className="px-4 py-2 text-sm text-gray-800">{item.title}</td>
-              <td className="px-4 py-2 text-sm text-gray-600">{item.category}</td>
-              <td className="px-4 py-2 text-sm text-gray-600">{item.condition}</td>
-              <td className="px-4 py-2 text-sm text-gray-800">${item.price.toLocaleString()}</td>
-              <td className="px-4 py-2 text-sm text-gray-600">{item.location}</td>
-              <td className="px-4 py-2 text-sm">
-                <button
-                  onClick={() => onEdit(item)}
-                  className="text-blue-600 hover:text-blue-800 hover:underline font-medium mr-3"
-                >
-                  Edit
-                </button>
-                <button
-                  onClick={() => onDelete(item.id)}
-                  className="text-red-600 hover:text-red-800 hover:underline font-medium"
-                >
-                  Delete
-                </button>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+          <tbody className="divide-y divide-gray-200">
+            {inventory.map((item) => (
+              <tr key={item.id} className="hover:bg-gray-50">
+                <td className="px-4 py-2">
+                  <img 
+                    src={item.images?.[0] || item.image} 
+                    alt={item.title}
+                    className="w-16 h-16 object-cover rounded"
+                  />
+                </td>
+                <td className="px-4 py-2 text-sm text-gray-800">{item.title}</td>
+                <td className="px-4 py-2 text-sm text-gray-600 capitalize">{item.category}</td>
+                <td className="px-4 py-2 text-sm text-gray-800">${item.price.toLocaleString()}</td>
+                <td className="px-4 py-2 text-sm">
+                  <div className="relative">
+                    <button
+                      id={`menu-${item.id}`}
+                      onClick={() => toggleMenu(item.id)}
+                      className="text-gray-600 hover:text-gray-900 p-2"
+                    >
+                      ⋮
+                    </button>
+                  </div>
+
+                  {openMenuId === item.id && (
+                    <>
+                      {/* Backdrop */}
+                      <div 
+                        className="fixed inset-0 z-40" 
+                        onClick={() => setOpenMenuId(null)}
+                      />
+
+                      {/* Menu - using fixed positioning */}
+                      <div 
+                        className="fixed bg-white rounded-lg shadow-xl border z-50 w-48"
+                        style={{
+                          top: `${document.getElementById(`menu-${item.id}`)?.getBoundingClientRect().bottom}px`,
+                          right: '20px'
+                        }}
+                      >
+                        <button
+                          onClick={() => {
+                            onEdit(item);
+                            setOpenMenuId(null);
+                          }}
+                          className="w-full text-left px-4 py-3 hover:bg-gray-100 text-sm text-gray-700 rounded-t-lg"
+                        >
+                          Edit Listing
+                        </button>
+                        
+                        <a
+                          href={`/vehicle/${item.id}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="block w-full text-left px-4 py-3 hover:bg-gray-100 text-sm text-gray-700"
+                          onClick={() => setOpenMenuId(null)}
+                        >
+                          View Details
+                        </a>
+                        <button
+                          onClick={() => {
+                            onDelete(item.id);
+                            setOpenMenuId(null);
+                          }}
+                          className="w-full text-left px-4 py-3 hover:bg-gray-100 text-sm text-red-600 rounded-b-lg"
+                        >
+                          Delete Listing
+                        </button>
+                      </div>
+                    </>
+                  )}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 }
@@ -219,10 +278,10 @@ function AddInventoryDialog({ isOpen, onClose, onAdd, editingItem, onUpdate }) {
                 onChange={handleChange}
                 className="w-full border border-gray-300 rounded p-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               >
-                <option value="boats">Boats</option>
-                <option value="rvs">RVs</option>
-                <option value="sedan">Sedan</option>
-                <option value="truck">Truck</option>
+                <option value="Boats">Boats</option>
+                <option value="RVs">RVs</option>
+                <option value="Trailers">Trailers</option>
+                <option value="Other">Other</option>
               </select>
             </div>
 
@@ -492,72 +551,105 @@ export default function AdminDashboard() {
     setDeleteConfirm(null);
   };
 
- return (
-  <div className="min-h-screen bg-gray-50 p-8">
-    <div className="max-w-7xl mx-auto">
-      <div className="flex justify-between items-center mb-6">
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900">Admin Dashboard</h1>
-          <p className="text-gray-600 mt-1">Manage your inventory</p>
-        </div>
-        <div className="flex gap-3">
-          <button
-            onClick={handleLogout}
-            className="px-4 py-2 border border-gray-300 rounded hover:bg-gray-500 font-medium text-white-100"
-          >
-            Logout
-          </button>
-          <button
-            onClick={() => navigate('/')}
-            className="px-4 py-2 border border-gray-300 rounded hover:bg-gray-500 font-medium text-white-100"
-          >
-            ← Back to Marketplace
-          </button>
-          <button
-            onClick={() => setIsDialogOpen(true)}
-            className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 font-medium"
-          >
-            + Add Inventory
-          </button>
-        </div>
-      </div>
-      
-
-        <div className="bg-white rounded-lg shadow p-6 mb-6">
-          <div className="grid grid-cols-3 gap-4">
-            <div className="text-center">
-              <div className="text-3xl font-bold text-gray-900">{inventory.length}</div>
-              <div className="text-sm text-gray-600">Total Items</div>
-            </div>
-            <div className="text-center">
-              <div className="text-3xl font-bold text-gray-900">
-                {inventory.filter(i => i.category === 'boats').length}
-              </div>
-              <div className="text-sm text-gray-600">Boats</div>
-            </div>
-            <div className="text-center">
-              <div className="text-3xl font-bold text-gray-900">
-                {inventory.filter(i => i.category === 'rvs').length}
-              </div>
-              <div className="text-sm text-gray-600">RVs</div>
-            </div>
+   return (
+    <div className="min-h-screen bg-gray-50 flex flex-col w-full">
+      {/* Sticky Header */}
+      <header className="sticky top-0 z-40 bg-white border-b shadow-sm">
+        <div className="flex items-center justify-between px-8 py-4">
+          <div className="flex items-center gap-6">
+            <Link 
+              to="/" 
+              className="flex items-center gap-2 text-gray-600 hover:text-gray-900 font-medium"
+            >
+              <span>← Back to Store</span>
+            </Link>
+            <h1 className="text-2xl font-bold text-gray-900">Dealer Dashboard</h1>
+          </div>
+          <div className="flex gap-3">
+            <button
+              onClick={handleLogout}
+              className="px-4 py-2 border border-gray-300 rounded hover:bg-gray-50 font-medium text-gray-700"
+            >
+              Logout
+            </button>
           </div>
         </div>
+      </header>
 
-      {loading ? (
-        <div className="text-center py-12">
-          <p className="text-gray-500">Loading inventory...</p>
+      {/* Main Content */}
+      <div className="flex-1 px-8 py-8 w-full">
+        <div className="w-full">
+          {/* Inventory Management Header */}
+          <div className="mb-6">
+            <div className="flex justify-between items-start">
+              <div>
+                <h2 className="text-3xl font-bold text-gray-900">Inventory Management</h2>
+                <p className="text-gray-600 mt-1">Manage your boats, RVs, trailers, and other listings.</p>
+              </div>
+              <button
+                onClick={() => setIsDialogOpen(true)}
+                className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 font-medium flex items-center gap-2"
+              >
+                <Tag size={16} /> Create New Listing
+              </button>
+            </div>
+          </div>
+
+          {/* Stats Cards */}
+          <div className="bg-white rounded-lg shadow p-6 mb-6">
+            <div className="grid grid-cols-5 gap-4">
+              <div className="text-center">
+                <div className="text-3xl font-bold text-gray-900">{inventory.length}</div>
+                <div className="text-sm text-gray-600">Total Items</div>
+              </div>
+              <div className="text-center">
+                <div className="text-3xl font-bold text-gray-900">
+                  {inventory.filter(i => i.category === 'Boats').length}
+                </div>
+                <div className="text-sm text-gray-600">Boats</div>
+              </div>
+              <div className="text-center">
+                <div className="text-3xl font-bold text-gray-900">
+                  {inventory.filter(i => i.category === 'RVs').length}
+                </div>
+                <div className="text-sm text-gray-600">RVs</div>
+              </div>
+              <div className="text-center">
+                <div className="text-3xl font-bold text-gray-900">
+                  {inventory.filter(i => i.category === 'Trailers').length}
+                </div>
+                <div className="text-sm text-gray-600">Trailers</div>
+              </div>
+              <div className="text-center">
+                <div className="text-3xl font-bold text-gray-900">
+                  {inventory.filter(i => i.category === 'Other').length}
+                </div>
+                <div className="text-sm text-gray-600">Other</div>
+              </div>
+            </div>
+          </div>
+
+          {/* Inventory Table */}
+          {loading ? (
+            <div className="text-center py-12">
+              <p className="text-gray-500">Loading inventory...</p>
+            </div>
+          ) : (
+            <InventoryTable inventory={inventory} onDelete={handleDeleteInventory} onEdit={handleEditInventory} />
+          )}
         </div>
-      ) : (
-        <InventoryTable inventory={inventory} onDelete={handleDeleteInventory} onEdit={handleEditInventory} />
-      )}
-  
+      </div>
+
+      {/* Dialogs */}
       <AddInventoryDialog
         isOpen={isDialogOpen}
-        onClose={() => { setIsDialogOpen(false); setEditingItem(null); }}
+        onClose={() => {
+          setIsDialogOpen(false);
+          setEditingItem(null);
+        }}
+        onAdd={handleAddInventory}
         editingItem={editingItem}
         onUpdate={handleUpdateInventory}
-        onAdd={handleAddInventory}
       />
 
       {deleteConfirm !== null && (
@@ -582,7 +674,6 @@ export default function AdminDashboard() {
           </div>
         </div>
       )}
-    </div>
     </div>
   );
 }
