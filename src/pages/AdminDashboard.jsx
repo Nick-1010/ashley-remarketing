@@ -48,7 +48,7 @@ function InventoryTable({ inventory, onDelete, onEdit }) {
                       onClick={() => toggleMenu(item.id)}
                       className="text-gray-600 hover:text-gray-900 p-2"
                     >
-                      ⋮
+                      . . .
                     </button>
                   </div>
 
@@ -149,40 +149,45 @@ function AddInventoryDialog({ isOpen, onClose, onAdd, editingItem, onUpdate }) {
   };
 
   const handleImageUpload = async (e) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-  
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
+
     try {
       setUploading(true);
-    
-      // Create unique filename
-      const fileExt = file.name.split('.').pop();
-      const fileName = `${Math.random().toString(36).substring(2)}_${Date.now()}.${fileExt}`;
-      const filePath = `${fileName}`;
-    
-      // Upload to Supabase Storage
-      const { data, error } = await supabase.storage
-        .from('vehicle-images')
-        .upload(filePath, file);
-    
-      if (error) throw error;
-    
-      // Get public URL
-      const { data: { publicUrl } } = supabase.storage
-        .from('vehicle-images')
-        .getPublicUrl(filePath);
-    
-      console.log('Upload successful:', publicUrl);
-      
-      // Add to images array
+
+      // Upload all files
+      const uploadPromises = Array.from(files).map(async (file) => {
+        const fileExt = file.name.split('.').pop();
+        const fileName = `${Math.random().toString(36).substring(2)}_${Date.now()}.${fileExt}`;
+        const filePath = `${fileName}`;
+
+        const { data, error } = await supabase.storage
+          .from('vehicle-images')
+          .upload(filePath, file);
+
+        if (error) throw error;
+
+        const { data: { publicUrl } } = supabase.storage
+          .from('vehicle-images')
+          .getPublicUrl(filePath);
+
+        return publicUrl;
+      });
+
+      // Wait for all uploads to complete
+      const uploadedUrls = await Promise.all(uploadPromises);
+
+      console.log('All uploads successful:', uploadedUrls);
+
+      // Add all URLs to images array
       setFormData(prev => ({
         ...prev,
-        images: [...prev.images, publicUrl]
+        images: [...prev.images, ...uploadedUrls]
       }));
-    
+
     } catch (error) {
       console.error('Upload error:', error);
-      alert('Image upload failed. Please try again.');
+      alert('Some images failed to upload. Please try again.');
     } finally {
       setUploading(false);
     }
@@ -327,7 +332,7 @@ function AddInventoryDialog({ isOpen, onClose, onAdd, editingItem, onUpdate }) {
                     onChange={handleImageUpload}
                     disabled={uploading}
                     className="hidden"
-                    multiple={false}
+                    multiple={true}
                   />
                 </label>
               </div>

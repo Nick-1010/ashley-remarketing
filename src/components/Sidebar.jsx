@@ -91,6 +91,8 @@ export default function Sidebar({ onFilterChange, activeCategory }) {
             buyingboats@gmail.com
           </div>
 
+          <hr className ="bg-border/50" />
+
           <div className="mt-2">
             <Link to="/login" className="underline text-xs hover:text-gray-900 flex items-center gap-1">
               <Lock size={16} /> Staff Login

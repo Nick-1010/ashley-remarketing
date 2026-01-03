@@ -74,7 +74,7 @@ export default function VehicleDetail() {
         <div className="max-w-7xl mx-auto px-4 py-4">
           <button
             onClick={() => navigate(-1)}
-            className="flex items-center text-white hover:text-gray-700"
+            className="flex items-center text-gray-700 hover:text-gray-700"
           >
             <ChevronLeft size={20} />
             <span>Back</span>
