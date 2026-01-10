@@ -10,6 +10,8 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import { supabase } from "./lib/supabaseClient";
 import ContactDealer from "./pages/ContactDealer";
 import Footer from "./components/Footer";
+import LandingPage from "./pages/LandingPage";
+import SellPage from "./pages/SellPage";
 
 function Marketplace() {
   const [filters, setFilters] = useState({
@@ -90,9 +92,11 @@ export default function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<Marketplace />} />
+        <Route path="/" element={<LandingPage />} />
+        <Route path="/marketplace" element={<Marketplace />} />
+        <Route path="/sell" element={<SellPage />} />
         <Route path="/vehicle/:id" element={<VehicleDetail />} />
-        <Route path="/contact/:id" element={<ContactDealer />} />  {/* This line */}
+        <Route path="/contact/:id" element={<ContactDealer />} />
         <Route path="/login" element={<Login />} />
         <Route 
           path="/admin" 
