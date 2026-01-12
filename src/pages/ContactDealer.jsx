@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import { ChevronLeft } from 'lucide-react';
 import { supabase } from '../lib/supabaseClient';
 import Footer from '../components/Footer';
+import emailjs from '@emailjs/browser';
 
 export default function ContactDealer() {
   const { id } = useParams();
@@ -52,16 +53,34 @@ export default function ContactDealer() {
     }));
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (!formData.name || !formData.email || !formData.message) {
       alert('Please fill in name, email, and message');
       return;
     }
 
-    // For now, just show success message
-    // Later you can integrate with email service
-    alert(`Thank you ${formData.name}! We'll contact you soon at ${formData.email}`);
-    navigate(-1);
+    try {
+      // Send email via EmailJS
+      await emailjs.send(
+        'service_6uyywyn',
+        'template_52k747f',
+        {
+          from_name: formData.name,
+          from_email: formData.email,
+          phone: formData.phone || 'Not provided',
+          vehicle_title: vehicle.title,
+          vehicle_price: `$${vehicle.price.toLocaleString()}`,
+          message: formData.message
+        },
+        'ObNA7A-rOjKtGCnFR'  // Your public key
+      );
+
+      alert(`Thank you ${formData.name}! We've received your inquiry and will contact you soon at ${formData.email}`);
+      navigate(-1);
+    } catch (error) {
+      console.error('Email send failed:', error);
+      alert('Failed to send inquiry. Please call us directly at (518) 542-1234');
+    }
   };
 
   if (loading) {

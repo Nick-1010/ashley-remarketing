@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import { useState } from "react";
 import { Phone, Mail } from "lucide-react";
+import emailjs from '@emailjs/browser';
 
 export default function SellPage() {
   const [formData, setFormData] = useState({
@@ -20,25 +21,43 @@ export default function SellPage() {
     }));
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (!formData.name || !formData.email || !formData.vehicleInfo) {
       alert('Please fill in name, email, and vehicle information');
       return;
     }
 
-    // For now, just show success message
-    // Later you can integrate with email service or save to database
-    alert(`Thank you ${formData.name}! We'll review your inquiry and contact you soon at ${formData.email}`);
-    
-    // Reset form
-    setFormData({
-      name: '',
-      email: '',
-      phone: '',
-      vehicleType: 'Boat',
-      vehicleInfo: '',
-      message: ''
-    });
+    try {
+      // Send email via EmailJS
+      await emailjs.send(
+        'service_6uyywyn',  // Your service ID
+        'template_52k747f',  // Same template (or create a new one for sell inquiries)
+        {
+          from_name: formData.name,
+          from_email: formData.email,
+          phone: formData.phone || 'Not provided',
+          vehicle_title: `${formData.vehicleType} - Sell Inquiry`,
+          vehicle_price: 'N/A',
+          message: `Vehicle Type: ${formData.vehicleType}\n\nVehicle Info: ${formData.vehicleInfo}\n\nAdditional Details: ${formData.message || 'None provided'}`
+        },
+        'ObNA7A-rOjKtGCnFR'  // Your public key
+      );
+
+      alert(`Thank you ${formData.name}! We'll review your inquiry and contact you soon at ${formData.email}`);
+
+      // Reset form
+      setFormData({
+        name: '',
+        email: '',
+        phone: '',
+        vehicleType: 'Boat',
+        vehicleInfo: '',
+        message: ''
+      });
+    } catch (error) {
+      console.error('Email send failed:', error);
+      alert('Failed to send inquiry. Please call us directly at (518) 542-1234');
+    }
   };
 
   return (

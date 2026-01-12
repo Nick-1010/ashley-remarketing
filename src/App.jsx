@@ -19,6 +19,7 @@ function Marketplace() {
   });
   const [inventory, setInventory] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   useEffect(() => {
     fetchInventory();
@@ -50,26 +51,55 @@ function Marketplace() {
     return matchesCategory;
   });
 
-  return (
+    return (
     <div className="min-h-screen bg-gray-100 flex">
-      {/* Sidebar - Full height on left */}
-      <Sidebar onFilterChange={handleFilterChange} activeCategory={filters.category} />
-
-      {/* Main content area - Right side */}
-      <div className="flex-1 flex flex-col">
+      {/* Mobile Menu Button */}
+      <button
+        onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+        className="md:hidden fixed top-4 left-4 z-50 p-2 bg-white rounded-lg shadow-lg"
+      >
+        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          {mobileMenuOpen ? (
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+          ) : (
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+          )}
+        </svg>
+      </button>
+        
+      {/* Overlay for mobile */}
+      {mobileMenuOpen && (
+        <div 
+          className="md:hidden fixed inset-0 bg-black bg-opacity-50 z-30"
+          onClick={() => setMobileMenuOpen(false)}
+        />
+      )}
+  
+      {/* Sidebar - Hidden on mobile unless menu is open */}
+      <div className={`
+        ${mobileMenuOpen ? 'translate-x-0' : '-translate-x-full'}
+        md:translate-x-0 transition-transform duration-300 ease-in-out
+        fixed md:static inset-y-0 left-0 z-40
+      `}>
+        <Sidebar onFilterChange={handleFilterChange} activeCategory={filters.category} />
+      </div>
+      
+      {/* Main content area */}
+      <div className="flex-1 flex flex-col w-full">
         <Header />
-        <main className="flex-1 p-8 overflow-x-hidden">
+        <main className="flex-1 p-4 md:p-8 overflow-x-hidden">
           <div className="mb-8">
-            <h1 className="text-3xl font-bold mb-2 text-gray-900">Today's Picks for You</h1>
+            <h1 className="text-2xl md:text-3xl font-bold mb-2 text-gray-900">Vehicle Listings</h1>
+            <p className="text-gray-600">{filteredItems.length} vehicles found</p>
           </div>
-
+          
           {loading ? (
             <div className="text-center py-12">
               <p className="text-gray-500">Loading vehicles...</p>
             </div>
           ) : (
             <>
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-6 w-full">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4 md:gap-6 w-full">
                 {filteredItems.map((item) => (
                   <ListingCard key={item.id} item={item} />
                 ))}
