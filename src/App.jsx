@@ -12,6 +12,7 @@ import ContactDealer from "./pages/ContactDealer";
 import Footer from "./components/Footer";
 import LandingPage from "./pages/LandingPage";
 import SellPage from "./pages/SellPage";
+import AboutPage from "./pages/AboutPage";
 
 function Marketplace() {
   const [filters, setFilters] = useState({
@@ -124,6 +125,7 @@ export default function App() {
       <Routes>
         <Route path="/" element={<LandingPage />} />
         <Route path="/marketplace" element={<Marketplace />} />
+        <Route path="/about" element={<AboutPage />} />
         <Route path="/sell" element={<SellPage />} />
         <Route path="/vehicle/:id" element={<VehicleDetail />} />
         <Route path="/contact/:id" element={<ContactDealer />} />

@@ -18,46 +18,6 @@ export default function LandingPage() {
               className="h-16"
             />
           </Link>
-
-          {/* Navigation */}
-          <nav className="flex items-center gap-6">
-            {/* About Us Dropdown */}
-            <div 
-              className="relative"
-              onMouseEnter={() => setShowAboutDropdown(true)}
-              onMouseLeave={() => setShowAboutDropdown(false)}
-            >
-              <button className="flex items-center gap-1 px-4 py-2 text-gray-700 hover:text-gray-900 font-medium">
-                About Us
-                <ChevronDown size={16} />
-              </button>
-
-              {showAboutDropdown && (
-                <div className="absolute top-full right-0 mt-2 w-48 bg-white rounded-lg shadow-xl border py-2">
-                  <Link 
-                    to="/about"
-                    className="block px-4 py-2 hover:bg-gray-100 text-gray-700"
-                  >
-                    Our Story
-                  </Link>
-                  <Link 
-                    to="/contact"
-                    className="block px-4 py-2 hover:bg-gray-100 text-gray-700"
-                  >
-                    Contact Us
-                  </Link>
-                  <a 
-                    href="https://www.google.com/maps/place/Ashley+Remarketing+Services/@42.6234982,-73.7417869,17z/data=!3m1!4b1!4m6!3m5!1s0x89dde3559a552ee7:0x834527b177e88f76!8m2!3d42.6234982!4d-73.739212!16s%2Fg%2F11gj_k2rdy?entry=ttu&g_ep=EgoyMDI1MTIwOS4wIKXMDSoASAFQAw%3D%3D"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="block px-4 py-2 hover:bg-gray-100 text-gray-700"
-                  >
-                    Reviews
-                  </a>
-                </div>
-              )}
-            </div>
-          </nav>
         </div>
       </header>
 

@@ -11,11 +11,13 @@ export default function Sidebar({ onFilterChange, activeCategory }) {
     <aside className="w-64 border-r bg-white h-screen sticky top-0 flex flex-col">
       {/* TOP: Fixed logo section */}
       <div className="px-4 py-6 bg-white">
-        <img 
-          src="/sizedlogo.png" 
-          alt="Ashley Remarketing Services" 
-          className="w-full h-auto"
-        />
+          <Link to="/">
+            <img 
+              src="/sizedlogo.png" 
+              alt="Ashley Remarketing Services" 
+              className="h-16"
+            />
+          </Link>
       </div>
 
       {/* MIDDLE: Scrollable categories section */}
